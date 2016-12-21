@@ -17,6 +17,8 @@ continueModel = False
 
 
 # UNCOMMENT MODEL - first must be downloaded from:
+# http://ufallab.ms.mff.cuni.cz/~kocmanek/lanidenn_models.tar.gz
+#
 #testingModel = "models/WikiMulti.model"
 # testingModel = "models/ALTW.model"
 testingModel = "models/LanideNN.model"

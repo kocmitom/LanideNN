@@ -1,3 +1,30 @@
 # LanideNN
 
-TODO
+LanideNN is language identification method based on Bidirectional Recurrent Neural Networks [1] and it performs well in monolingual and multilingual language identification tasks on six testsets. The method keeps its accuracy also for short documents and across domains, so it is ideal for the off-the-shelf use without preparation of training data.
+
+We have released the LanideNN code and models at https://github.com/tomkocmi/LanideNN
+
+
+# Installation
+
+You will need TensorFlow 0.8 (we are planning to migrate whole framework into
+ NeuralMonkey and solve a problem with long running time)
+
+Also you will need following python packages:
+
+  pip install iso-639 abc unicodedata
+
+
+# Running
+
+Simply edit main.py and run it. You can train your own models or load
+our pretrained models at
+http://ufallab.ms.mff.cuni.cz/~kocmanek/lanidenn_models.tar.gz
+
+# Contact
+
+In case of any problems please feel free to send an email to
+kocmi@ufal.mff.cuni.cz
+
+
+[1] Tom Kocmi and Ondřej Bojar. LanideNN: Multilingual Language Identification on Character Window. In EACL 2017

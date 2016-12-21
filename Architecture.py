@@ -201,12 +201,6 @@ class Arch(object):
                 outs = self.model.eval(self.sess, dev_batch_xs, lengths)
             for j in range(len(outs[0])):
                 for i in range(len(outs)):
-                    if languages is not None:
-                        new_out = {}
-                        for a in range(len(langs_mask)):
-                            if langs_mask[a]==1:
-                                new_out[a] = outs[i][j][a]
-                    
                     maxim = outs[i][j]
                     
                     if dev_batch_xs[i][j] == datafile.trg_vocab.PAD_ID:
@@ -221,7 +215,7 @@ class Arch(object):
         accur = 0
         if total > 0:
             accur = float(guesses[max]) / float(total)
-            
+
         print([datafile.get_target_name(max), accur])
 
     def training(self, eval=None):
