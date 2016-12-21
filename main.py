@@ -1,0 +1,124 @@
+#!/usr/bin/python -u
+# -*- coding: utf-8 -*-
+
+import tensorflow as tf
+import time
+import logging
+import numpy as np
+import LangspotData
+import os
+import sys
+import operator
+import inspect
+import OFArchitecture
+import ComputePRF
+from LanideNN import BiRNN, Parameters, MathUtils
+
+
+logging.basicConfig(format='%(levelname)s : %(message)s', level=logging.INFO)
+
+if len(sys.argv) > 1:
+    shell_arg = sys.argv[1]
+    print("SHELL ARGUMENT IS {0}".format(shell_arg))
+else:
+    shell_arg = None
+
+#ComputePRF.evaluate("results/ALTW_1467725563.6501234", "test/altw2010-langid/tst-lang", ",", get_confusion=True)
+# ComputePRF.evaluate("results/baldwin_all_1464695873.6513074", "test/baldwin/Wikipedia.meta", separator="\t", columnsEG=[1,2])
+# ComputePRF.evaluate("results/langid_baldwin_TCL_1466676944.18", "test/baldwin/TCL.meta", separator="\t", columnsEG=[1, 2])
+#ComputePRF.evaluate("results/WikiMulti_1467726115.024573", "test/wikipedia-multi-v6/wikipedia-multi/all-meta3", ",", get_confusion=True)
+
+#ComputePRF.evaluate("competitors/second_try/polyglot/polyglot/altw.output4", "test/altw2010-langid/tst-lang", ",")
+#ComputePRF.evaluate("competitors/second_try/polyglot/polyglot/wiki.output2", "test/wikipedia-multi-v6/wikipedia-multi/all-meta3", ",")
+
+# ComputePRF.evaluate("results/baldwin_EuroGOV_1467279129.5578198", "test/baldwin/EuroGOV.meta", separator="\t", columnsEG=[1, 2], get_confusion=True)
+# ComputePRF.evaluate("results/baldwin_TCL_1467280939.907269", "test/baldwin/TCL.meta", separator="\t", columnsEG=[1, 2], get_confusion=True)
+#ComputePRF.evaluate("results/baldwin_Wikipedia_1467738482.9382815", "test/baldwin/Wikipedia.meta", separator="\t", columnsEG=[1, 2], get_confusion=True)
+
+
+#exit(7)
+
+
+
+
+
+params = Parameters.Parameters("PARAMS")
+
+testingModel = False
+continueModel = False
+
+# POUZITE DO CLANKU
+# WIKIMULTI
+#testingModel = "models/BiRNN.1467122811.step75000.m100_s500-l1.model"
+# ALTW
+# testingModel = "models/BiRNN.1467244296.step140000.m100_s500-l1.model"
+
+testingModel = "models/BiRNN.1468405024.step530000.m200_s500-l1.model"
+
+
+if continueModel:
+    params.continue_model(continueModel)
+    logging.info("CONTINUING model {0}. Trained for {1} steps".format(continueModel, params.params["step"]))
+    testingModel = params.params["identification"]
+elif testingModel:
+    params.load_params(testingModel)
+    logging.info("Loading model " + testingModel)
+else:
+    params.add_integer("version", 3)  # version of a code
+    params.add_string("corpus_name", "data")  # Folder with data.
+    params.add_bool("unicode_normalization", True)  # normalize unicode
+    params.add_integer("size", 500)  # Size of each model layer.
+    params.add_integer("embedding_size", 200)  # Size of each model layer.
+    params.add_integer("num_layers", 1)  # Number of layers in the model.
+    params.add_bool("pad_lines", False) # Never used in experiments for EACL2017
+    params.add_float("dropout", 0.5)
+    params.add_float("learning_rate", 1e-4)  # earlier 1e-3
+    params.add_float("unknown_prob", 0)  # probability that some inputs will be changed for UNK during training to simulate testing
+    params.add_integer("min_count", 50)  # minimal number of occurences of element
+
+    # updatable arguments
+    params.add_integer("trained_lines", 0)  # how many lines was trained through
+    params.add_integer("epochs", 0)  # how many times it went through data
+    params.add_integer("step", 0)  # how many steps it was already learning
+
+params.add_integer("max_iters", 1000000)  # How many training steps to do in total.
+params.add_integer("steps_per_checkpoint", 5000)  # How many training steps to do per checkpoint.
+
+params.add_integer("batch_size", 64)  # Batch size to use during training.
+params.add_string("time_stop", "")  # hour in format HH when the training should stop, anything out of this format won't be considered, if I tried putting minutes there the training sometimes takes more time and skip that minute
+
+params.add_integer("max_length", 200)  # Max length of input.
+
+params.print()
+
+with tf.Session() as sess:
+    start = time.time()  # for counting the time
+
+    arch = OFArchitecture.Arch(sess, params, testingModel)
+
+    # arch.training(eval=lambda:arch.evaluateWikiMulti(4))
+    #arch.training()
+
+
+    arch.evaluate_short_dataset()
+
+
+
+    #arch.evaluate_short_dataset()
+
+
+
+    #arch.evaluate_string('Ich sag Gute Nacht. And I say good night. Schon leuchtet ein Stern. Yes, I see the light.', True, ['deu', 'eng'])
+    #arch.evaluate_string('Text reading assistance: 昨日すき焼きを食べました.', True, ['jpn','eng'])
+    #arch.evaluate_string('The Quatrième Étage is a short story written by Jean Hougron', True, ['fra', 'eng'])
+    #arch.evaluate_string("Je n'ai pas dormi depuis trois jours. I haven’t slept for three days. Est-ce que vous en avez parlé à la police", True, ['fra','eng'])
+    #arch.evaluate_string('La signora lesse il messaggio e volse a Daisy uno sguardo di intesa. The lady read the message and looked up at Daisy in a knowing way.', True, ['ita','eng'])
+    #arch.evaluate_string('Nearby was a little note written in pencil. Vedle byla malá cedulka se vzkazem napsaným tužkou.', True, ['ces','eng'])
+    #arch.evaluate_string("At that time of night there were few people around. A cette heure de la nuit il n'y avait pas grand monde aux alentours.", True, ['fra','eng'])
+    #arch.evaluate_string("Cette église s'élevait sur une place étroite et sombre, près de la grille du Palais. Tämä kirkko oli ahtaalla ja pimeällä paikalla lähellä Oikeuspalatsin aitausta. The church stood in a narrow, gloomy square, not far from the gates of the Palais de Justice.", True, ['eng', 'fra', 'fin'])
+    #arch.evaluate_string('She was thirty years old and had been a detective for the past two years. Ей было тридцать лет, и последние два года она была сыщиком.', True,['rus','eng'])
+    #arch.evaluate_string('Eravamo tre contro uno, però; e la mozione fu approvata. Men omröstningen utföll tre mot en dock, sa förslaget bifölls.', True, ['ita','swe'])
+    #arch.evaluate_string('El chico no tiene en la cabeza nada más que el negocio. Der Junge hat ja nichts im Kopf als das Geschäft.', True, ['deu', 'spa'])
+
+
+    print("Script finished in " + str(int(time.time() - start)) + " s")
