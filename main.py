@@ -15,13 +15,12 @@ params = Parameters.Parameters("PARAMS")
 testingModel = False
 continueModel = False
 
-# POUZITE DO CLANKU
 # WIKIMULTI
-#testingModel = "models/BiRNN.1467122811.step75000.m100_s500-l1.model"
+#testingModel = "models/WikiMulti.model"
 # ALTW
-# testingModel = "models/BiRNN.1467244296.step140000.m100_s500-l1.model"
+# testingModel = "models/ALTW.model"
 
-testingModel = "models/BiRNN.1468405024.step530000.m200_s500-l1.model"
+testingModel = "models/LanideNN.model"
 
 
 if continueModel:
