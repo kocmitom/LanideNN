@@ -1,0 +1,4 @@
+identification ? str	result Initialized str	version 2 int	corpus_name cleaned_html2 str	max_iters 1280001 int	unicode_normalization True bool	size 300 int	embedding_size 100 int	num_layers 1 int	max_length 100 int	batch_size 64 int	steps_per_checkpoint 100 int	dropout 0.5 float	learning_rate 0.001 float	unknown_prob 0 float	min_count 10 int	trained_lines 0 int	epochs 0 int	step 0 int	pad_lines False bool
+models/WikiMulti.model	0.9520840170659666	3	wikimulti3	150000	True	500	200	1	100	64	15000	0.5	0.001	0.0	5	3898	23	75000	False
+models/ALTW.model	88.4689094388	3	ALTW_sep3	150000	True	500	200	1	100	64	5000	0.5	0.0001	0	5	135304	14	140000	False
+models/LanideNN.model	96.5055650685	3	prepared4	1000000	True	500	200	1	200	64	5000	0.5	0.0001	0.0	50	1625420	13	530000	False
