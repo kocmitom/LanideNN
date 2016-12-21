@@ -4,43 +4,11 @@
 import tensorflow as tf
 import time
 import logging
-import numpy as np
-import LangspotData
-import os
-import sys
-import operator
-import inspect
-import OFArchitecture
-import ComputePRF
-from LanideNN import BiRNN, Parameters, MathUtils
+import Architecture
+from LanideNN import Parameters
 
 
 logging.basicConfig(format='%(levelname)s : %(message)s', level=logging.INFO)
-
-if len(sys.argv) > 1:
-    shell_arg = sys.argv[1]
-    print("SHELL ARGUMENT IS {0}".format(shell_arg))
-else:
-    shell_arg = None
-
-#ComputePRF.evaluate("results/ALTW_1467725563.6501234", "test/altw2010-langid/tst-lang", ",", get_confusion=True)
-# ComputePRF.evaluate("results/baldwin_all_1464695873.6513074", "test/baldwin/Wikipedia.meta", separator="\t", columnsEG=[1,2])
-# ComputePRF.evaluate("results/langid_baldwin_TCL_1466676944.18", "test/baldwin/TCL.meta", separator="\t", columnsEG=[1, 2])
-#ComputePRF.evaluate("results/WikiMulti_1467726115.024573", "test/wikipedia-multi-v6/wikipedia-multi/all-meta3", ",", get_confusion=True)
-
-#ComputePRF.evaluate("competitors/second_try/polyglot/polyglot/altw.output4", "test/altw2010-langid/tst-lang", ",")
-#ComputePRF.evaluate("competitors/second_try/polyglot/polyglot/wiki.output2", "test/wikipedia-multi-v6/wikipedia-multi/all-meta3", ",")
-
-# ComputePRF.evaluate("results/baldwin_EuroGOV_1467279129.5578198", "test/baldwin/EuroGOV.meta", separator="\t", columnsEG=[1, 2], get_confusion=True)
-# ComputePRF.evaluate("results/baldwin_TCL_1467280939.907269", "test/baldwin/TCL.meta", separator="\t", columnsEG=[1, 2], get_confusion=True)
-#ComputePRF.evaluate("results/baldwin_Wikipedia_1467738482.9382815", "test/baldwin/Wikipedia.meta", separator="\t", columnsEG=[1, 2], get_confusion=True)
-
-
-#exit(7)
-
-
-
-
 
 params = Parameters.Parameters("PARAMS")
 
@@ -83,10 +51,8 @@ else:
 
 params.add_integer("max_iters", 1000000)  # How many training steps to do in total.
 params.add_integer("steps_per_checkpoint", 5000)  # How many training steps to do per checkpoint.
-
 params.add_integer("batch_size", 64)  # Batch size to use during training.
 params.add_string("time_stop", "")  # hour in format HH when the training should stop, anything out of this format won't be considered, if I tried putting minutes there the training sometimes takes more time and skip that minute
-
 params.add_integer("max_length", 200)  # Max length of input.
 
 params.print()
@@ -94,18 +60,24 @@ params.print()
 with tf.Session() as sess:
     start = time.time()  # for counting the time
 
-    arch = OFArchitecture.Arch(sess, params, testingModel)
+    arch = Architecture.Arch(sess, params, testingModel)
 
-    # arch.training(eval=lambda:arch.evaluateWikiMulti(4))
     #arch.training()
 
 
-    arch.evaluate_short_dataset()
+    langs = None
+    # langs = ['afr', 'sqi', 'ara', 'hye', 'aze', 'eus', 'bel',
+    #                        'ben', 'bul', 'cat', 'hrv', 'ces', 'zho', 'dan',
+    #                        'nld', 'eng', 'est', 'fin', 'fra', 'glg', 'kat',
+    #                        'deu', 'ell', 'guj', 'hat', 'heb', 'hin', 'hun',
+    #                        'isl', 'ind', 'gle', 'ita', 'jav', 'jpn', 'kan',
+    #                        'kor', 'lav', 'lit', 'mkd', 'msa', 'mal', 'mlt',
+    #                        'mar', 'nep', 'nor', 'ori', 'fas', 'pol', 'por',
+    #                        'pan', 'ron', 'rus', 'srp', 'sin', 'slk', 'slv',
+    #                        'spa', 'swa', 'swe', 'tgl', 'tam', 'tel', 'tha',
+    #                        'tur', 'ukr', 'urd', 'vie', 'cym']
 
-
-
-    #arch.evaluate_short_dataset()
-
+    arch.evaluate_short_dataset(langs)
 
 
     #arch.evaluate_string('Ich sag Gute Nacht. And I say good night. Schon leuchtet ein Stern. Yes, I see the light.', True, ['deu', 'eng'])

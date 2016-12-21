@@ -2,11 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import random
-import re
 import os
 import logging
-import numpy as np
-import tensorflow as tf
 from LanideNN import Vocabulary
 import abc
 

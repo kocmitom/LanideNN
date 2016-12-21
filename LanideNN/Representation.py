@@ -1,17 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import random
-import re
 import os
 import logging
-import numpy as np
-import tensorflow as tf
-from tensorflow.python.ops.constant_op import constant
-from tensorflow.python.framework import dtypes
-from tensorflow.models.rnn import rnn, rnn_cell, seq2seq
-from tensorflow.python.ops import math_ops
-from tensorflow.python.ops import nn_ops
 
 
 class Representation(object):

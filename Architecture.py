@@ -1,23 +1,15 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from CharRepre import Data
 import logging
-import time
-import ComputePRF
-import numpy as np
-import CharModel
-import LanguageID
-
 import os
-import inspect
-import numpy as np
-from operator import itemgetter
+import time
 
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-os.sys.path.insert(0, parentdir)
-from KocmiTF import Vocabulary
+import numpy as np
+
+import ComputePRF
+from LanideNN import Vocabulary, LanguageID, BiRNN_Embed
+from LanideNN.CharRepre import Data
 
 
 class Arch(object):
@@ -28,7 +20,7 @@ class Arch(object):
         self.train_set = Data(self.params, "data/" + self.params.get("corpus_name") + "/train", None, only_eval=False)
         self.train_set.prepare_data(self.params.get("min_count"))
 
-        self.model = CharModel.Model(sess, self.params, self.train_set.vocab_size())
+        self.model = BiRNN_Embed.Model(sess, self.params, self.train_set.vocab_size())
 
         if trained_model:
             # restore model
@@ -153,198 +145,25 @@ class Arch(object):
                     # no language was outputted
                     bal.write(filename[1] + separator + unknown + "\n")
 
-    def evaluate_baldwin(self, improved=False):
-        # all model languages TODO CHANGE FOR NEW MODELS
-        # prepared
-        allowed_langs = ["ru", "new", "gl", "nl", "da", "cmn", "hu", "cs", "en", "ja", "it", "eo", "ber", "bg", "de", "pt", "he", "fr", "ar", "uk", "eu", "sk", "pms", "et", "es", "is", "vi", "lt",
-                         "fi", "az", "af", "sv", "lv", "pl", "id", "zh", "tr", "kn", "el", "an", "sr", "gu", "fa", "ko", "mk", "ro", "kk", "ta", "ml", "be", "cy", "ms", "hr", "ur", "te", "nn", "bs",
-                         "als", "lb", "fy", "br", "hi", "no", "la", "sl", "ca", "th", "bn", "ka", "tl", "sq", "pa", "si", "mr", "oc", "sw", "bpy", "ht", "ast", "jv", "ku", "ia", "ga", "yi", "lmo",
-                         "as", "ks", "hy", "mn", "li", "or", "sco", "ne", "wa", "nds", "vec", "pes", "tlh", "hsb", "jbo", "sah", "gd", "qu", "nb", "tt", "fo", "ug", "pnb", "ceb", "am", "glk", "bcl",
-                         "co"]
-        # prepared2
-        allowed_langs = ["af", "am", "ar", "an", "as", "ast", "az", "ba", "bcl", "be", "bn", "ber", "bpy", "br", "bg", "ca", "ceb", "cs", "ce", "cv", "co", "cy", "da", "de", "dv", "ekk", "el", "en",
-                         "et", "eu", "fa", "fi", "fr", "fy", "gd", "ga", "gl", "gom", "gsw", "gu", "ht", "he", "hif", "hi", "hr", "hsb", "hu", "hy", "io", "ilo", "ia", "id", "it", "jv", "ja",
-                         "kl", "kn", "ks", "ka", "kk", "ky", "ko", "ku", "la", "lv", "li", "lt", "lb", "lg", "lus", "ml", "mr", "min", "mk", "mg", "mt", "mn", "mi", "ms", "nds", "ne", "new", "nl",
-                         "nn", "no", "nso", "oc", "or", "os", "pam", "pa", "pms", "pnb", "pl", "pt", "ps", "rm", "ro", "ru", "sah", "scn", "si", "sk", "sl", "sn", "so", "es", "sq", "sr", "su", "sw",
-                         "sv", "ta", "tt", "te", "tg", "tl", "th", "tr", "ug", "uk", "ur", "uz", "vec", "vi", "vo", "wa", "yi", "zh", "zu"] #"is",
-        
-        #prepared3
-        if not improved:
-            allowed_langs = ["af","am","ar","an","as","ast","az","ba","bcl","be","bn","ber","bpy","br","bg","ca","ceb","cs","ce","cv","co","cy","da","de","dv","ekk","el","en","et","eu","fa","fi","fr","fy","gd","ga","gl","gom","gsw","gu","ht","he","hif","hi","hr","hsb","hu","hy","io","ilo","ia","id","is","it","jv","ja","kl","kn","ks","ka","kk","ky","ko","ku","la","lv","li","lt","lb","lg","lo","lus","ml","mr","min","mk","mg","mt","mn","mi","ms","nds","ne","new","nl","nn","no","nso","oc","or","os","pam","pa","pms","pnb","pl","pt","ps","rm","ro","ru","sah","scn","si","sk","sl","sn","so","es","sq","sr","su","sw","sv","ta","tt","te","tg","tl","th","tr","ug","uk","ur","uz","vec","vi","vo","wa","yi","zh","zu"]
-        else:
-            # lanfid
-            allowed_langs = ["af", "am", "an", "ar", "as", "az", "be", "bg", "bn", "br", "bs", "ca", "cs", "cy", "da", "de", "dz", "el", "en", "eo", "es", "et", "eu", "fa", "fi", "fo", "fr", "ga",
-                                "gl",
-                                "gu", "he", "hi", "hr", "ht", "hu", "hy", "id", "is", "it", "ja", "jv", "ka", "kk", "km", "kn", "ko", "ku", "ky", "la", "lb", "lo", "lt", "lv", "mg", "mk", "ml", "mn",
-                                "mr",
-                                "ms", "mt", "nb", "ne", "nl", "nn", "no", "oc", "or", "pa", "pl", "ps", "pt", "qu", "ro", "ru", "rw", "se", "si", "sk", "sl", "sq", "sr", "sv", "sw", "ta", "te", "th",
-                                "tl",
-                                "tr", "ug", "uk", "ur", "vi", "vo", "wa", "xh", "zh", "zu"]
-        # # actual languages of dataset
-            allowed_langs = ["af", "an", "ar", "az", "be", "bg", "bn", "br", "bs", "ca", "cs", "cy", "da", "de", "el", "en", "es", "et", "eu", "fa", "fi", "fr", "ga", "gl", "ha", "he", "hi", "hr", "ht", "hu",
-               "id", "io", "is", "it", "ja", "jv", "ka", "kk", "ko", "ku", "ky", "la", "lb", "lo", "lt", "lv", "mk", "ml", "mr", "ms", "ne", "nl", "nn", "no", "oc", "pl", "ps", "pt", "ro", "ru",
-                  "sh", "hbs", "sk", "sl", "so", "sq", "sr", "su", "sv", "sw", "ta", "te", "th", "tl", "tr", "uk", "ur", "uz", "vi", "wa", "zh", "zu"] #+ UNKNOWN
-
-        # # languages per corpus + UNKNOWN
-        # allowed_langs = {
-        #     "TCL": ["af", "ar", "az", "bg", "bn", "ca", "cs", "cy", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "ga", "ha", "he", "hi", "hr", "hu", "id", "is", "it", "ja", "kk", "ko", "ky",
-        #             "lo", "lv", "mk", "ml", "ne", "nl", "no", "pl", "ps", "pt", "ro", "ru", "sk", "sl", "so", "sq", "sr", "sv", "sw", "ta", "th", "tl", "tr", "uk", "ur", "uz", "vi", "zh", "zu"],
-        #     "EuroGOV": ["de", "en", "es", "fi", "fr", "hu", "it", "nl", "pt", "ro"],
-        #     "Wikipedia": ["af", "an", "ar", "az", "be", "bg", "bn", "br", "bs", "ca", "cs", "cy", "da", "de", "el", "en", "et", "eu", "fa", "fi", "fr", "gl", "he", "hi", "hr", "ht", "hu", "id", "io",
-        #                   "is", "it", "ja", "jv", "ka", "ko", "ku", "la", "lb", "lt", "lv", "mk", "mr", "ms", "nl", "nn", "no", "oc", "pl", "pt", "ro", "ru", "sh", "hbs", "sk", "sl", "sq", "su", "sv", "ta",
-        #                   "te", "th", "tl", "tr", "uk", "vi", "wa", "zh"]}
-        # print("DO NOT FORGET TO ADD WHICH LANGUAGE SHOULD BE USED IN ALLOWED LANGS BY: allowed_langs[cor]")
-
-        # evaluate baldwin testing data
-        datasets = ["EuroGOV", "TCL", "Wikipedia"]
-        # datasets = ["EuroGOV"] # smallest
-        folder = "test/baldwin/"
-        baldwin = Data(self.params, None, "data/" + self.params.get("corpus_name") + "/train", only_eval=True)
-
-        #code_swaps = {"hbs": "sh"}
-        code_swaps = {}
-
-        for cor in datasets:
-            output_file = "results/baldwin_" + cor + "_" + str(time.time())
-
-            def __gen():
-                with open(folder + cor + ".meta", encoding='utf-8', mode='r') as c:
-                    for line in c:
-                        attr = line.strip().split('\t')
-                        encoding = attr[1]
-
-                        if encoding == "big5" or encoding == "gb2312":
-                            encoding = "utf-8"
-
-                        yield [folder + cor + "/", attr[0], encoding]
-
-            files = __gen()
-
-            start = time.time()
-            self.evaluate(files, 1, allowed_langs, output_file, 100, unknown="en", separator="\t", code_swaps=code_swaps)
-            print("Script finished on corpus " + cor + " in " + str(int(time.time() - start)) + " s")
-
-            logging.info("Results on " + cor + ".meta saved in " + output_file)
-            ComputePRF.evaluate(output_file, "test/baldwin/" + cor + ".meta", separator="\t", columnsEG=[1, 2])
-
-    def evaluate_ALTW(self, threashold, eval_lines=False, max_langs=2, improved=False):
-        if improved:
-            allowed_langs = ["af", "an", "ar", "ast", "az", "be", "bg", "bn", "bpy", "br", "bs", "ca", "ceb", "cs", "cy", "da", "de", "el", "en", "et", "eu", "fa", "fi", "fr", "gl", "he", "hi", "hr",
-                         "ht",
-                         "hu", "id", "io", "is", "it", "ja", "jv", "ka", "ko", "ku", "la", "lb", "lt", "lv", "mk", "mr", "ms", "nap", "nds", "new", "nl", "nn", "no", "oc", "pl", "pms", "pt", "ro",
-                         "ru",
-                         "scn", "sh", "sk", "sl", "sq", "su", "sv", "ta", "te", "th", "tl", "tr", "uk", "vi", "wa", "zh"]
-        else:
-            allowed_langs = ["af","am","ar","an","as","ast","az","ba","bcl","be","bn","ber","bpy","br","bg","ca","ceb","cs","ce","cv","co","cy","da","de","dv","ekk","el","en","et","eu","fa","fi","fr","fy","gd","ga","gl","gom","gsw","gu","ht","he","hif","hi","hr","hsb","hu","hy","io","ilo","ia","id","is","it","jv","ja","kl","kn","ks","ka","kk","ky","ko","ku","la","lv","li","lt","lb","lg","lo","lus","ml","mr","min","mk","mg","mt","mn","mi","ms","nds","ne","new","nl","nn","no","nso","oc","or","os","pam","pa","pms","pnb","pl","pt","ps","rm","ro","ru","sah","scn","si","sk","sl","sn","so","es","sq","sr","su","sw","sv","ta","tt","te","tg","tl","th","tr","ug","uk","ur","uz","vec","vi","vo","wa","yi","zh","zu"]
-        output_file = "results/ALTW_" + str(time.time())
-        folder = "test/altw2010-langid/tst/"
-
-        def __gen():
-            for filename in os.listdir(folder):
-                if filename == '.history-kocmanek':
-                    continue
-
-                yield [folder, filename]
-
-        files = __gen()
-
-        #code_swaps = {"hbs": "sh"}
-        code_swaps = {}
-
-        self.evaluate(files, max_langs, allowed_langs, output_file, threashold, eval_lines, code_swaps=code_swaps)
-
-        logging.info("Evaluation of ALTW with threashold " + str(threashold) + " is in " + output_file)
-        return ComputePRF.evaluate(output_file, "test/altw2010-langid/tst-lang", ",")
-
-    def evaluateWikiMulti(self, threashold, max_langs=5, eval_lines=False, eval_blocks=False, smoothing=0, improved=False):
-        if improved:
-            allowed_langs = ["ar", "az", "bg", "bn", "ca", "cs", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gl", "he", "hi", "hr", "hu", "id", "it", "ja", "ka", "ko", "lt", "mk", "ms", "nl",
-                         "no", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "ta", "te", "th", "tr", "uk", "vi", "zh"]
-        else:
-            allowed_langs = ["af","am","ar","an","as","ast","az","ba","bcl","be","bn","ber","bpy","br","bg","ca","ceb","cs","ce","cv","co","cy","da","de","dv","ekk","el","en","et","eu","fa","fi","fr","fy","gd","ga","gl","gom","gsw","gu","ht","he","hif","hi","hr","hsb","hu","hy","io","ilo","ia","id","is","it","jv","ja","kl","kn","ks","ka","kk","ky","ko","ku","la","lv","li","lt","lb","lg","lo","lus","ml","mr","min","mk","mg","mt","mn","mi","ms","nds","ne","new","nl","nn","no","nso","oc","or","os","pam","pa","pms","pnb","pl","pt","ps","rm","ro","ru","sah","scn","si","sk","sl","sn","so","es","sq","sr","su","sw","sv","ta","tt","te","tg","tl","th","tr","ug","uk","ur","uz","vec","vi","vo","wa","yi","zh","zu"]
-        folder = "test/wikipedia-multi-v6/wikipedia-multi/"
-        output_file = "results/WikiMulti_" + str(time.time())
-
-        def __gen():
-            read = []
-            with open(folder + "all-meta3", mode='r') as all_meta:
-                for line in all_meta:
-                    line = line.strip().split(',')
-                    file = line[0]
-
-                    if file in read:
-                        continue
-
-                    read.append(file)
-
-                    yield [folder, file]
-
-        files = __gen()
-
-        self.evaluate(files, max_langs, allowed_langs, output_file, threashold, eval_lines, eval_blocks, smoothing)
-
-        logging.info("Evaluation of MultiWiki with threashold " + str(threashold) + " is in " + output_file)
-        return ComputePRF.evaluate(output_file, folder + "all-meta3", ",")
-
-    def evaluate_tweetlid(self):
-        output_file = "results/tweetlid_" + str(time.time())
-        print("Outputing file is " + output_file)
-
-        test = "test/TweetLID_corpusV2/official_test_tweets.tsv"
-        labels = "test/TweetLID_corpusV2/official_test_labels.tsv"
-
-        datafile = Data(self.params, test, "data/" + self.params.get("corpus_name") + "/train")
-
-        with open(output_file, encoding='utf-8', mode='w', buffering=1) as bal:
-            with open(labels, encoding='utf-8', mode='r', buffering=1) as lab:
-                while not datafile.is_finished():
-                    dev_batch_xs, _, lengths = datafile.get_batch()
-                    outs = self.model.eval(self.sess, dev_batch_xs, lengths)
-                    for j in range(len(outs[0])):
-                        label = next(lab, None)
-                        guesses = np.zeros(self.train_set.vocab_size()[1], np.int)
-                        for i in range(len(outs)):
-                            if dev_batch_xs[i][j] == datafile.trg_vocab.PAD_ID:
-                                break
-                            guesses[outs[i][j]] += 1
-                        if label is not None:
-                            max = np.argmax(guesses)
-                            language = datafile.get_target_name(max, "orig")
-                            if language.startswith("_"):
-                                language = "und"
-                            bal.write(label.strip() + "\t" + language + "\n")
-                        else:
-                            print("out of LABELS :/ ... something is wrong or the final batch padding happened")
-
-    def evaluate_short_dataset(self, improved=False):
-        short_dataset_langs = ['afr', 'sqi', 'ara', 'hye', 'aze', 'eus', 'bel', 'ben', 'bul', 'cat', 'hrv', 'ces', 'zho', 'dan', 'nld', 'eng', 'est', 'fin', 'fra', 'glg', 'kat', 'deu', 'ell', 'guj', 'hat',
-                       'heb', 'hin', 'hun', 'isl', 'ind', 'gle', 'ita', 'jav', 'jpn', 'kan', 'kor', 'lav', 'lit', 'mkd', 'msa', 'mal', 'mlt', 'mar', 'nep', 'nor', 'ori', 'fas', 'pol', 'por', 'pan',
-                       'ron', 'rus', 'srp', 'sin', 'slk', 'slv', 'spa', 'swa', 'swe', 'tgl', 'tam', 'tel', 'tha', 'tur', 'ukr', 'urd', 'vie', 'cym']
-        source = "test/short_dataset"
+    def evaluate_dataset(self, allowed_languages=None):
+        source = "test/LanideNN_testset"
         correct_all = 0
-        correct_inter = 0
         total_all = 0
-        total_inter = 0
         with open(source, mode='r') as src:
             for l in src:
                 if total_all % 1000 == 0:
-                    print("processed out of 13100: ", total_all)
+                    print("processed lines ", total_all)
                 entry = l.strip().split(' ', 1)
-                if improved:
-                    guess = self.evaluate_string(entry[1], languages=short_dataset_langs)
+                if allowed_languages is not None:
+                    guess = self.evaluate_string(entry[1], languages=allowed_languages)
                 else:
                     guess = self.evaluate_string(entry[1])
                 a = LanguageID.LanguageID(guess[0])
                 total_all += 1
-                if entry[0] in short_dataset_langs:
-                    total_inter += 1
                 if entry[0] == a.get_iso3():
                     correct_all += 1
-                    if entry[0] in short_dataset_langs:
-                        correct_inter += 1
 
-
-        print("Accuracy all: {0} ({1}/{2}), Accuracy inter: {3} ({4}/{5})".format(correct_all / total_all, correct_all, total_all, correct_inter / total_inter, correct_inter, total_inter))
+        print("Accuracy all: {0} ({1}/{2})".format(correct_all / total_all, correct_all, total_all))
 
     def evaluate_string(self, text, print_per_character=False, languages = None):
         if languages is not None:
