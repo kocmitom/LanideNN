@@ -70,11 +70,11 @@ with tf.Session() as sess:
     # langs = ['ces', 'eng', 'fra', 'deu', 'spa']
     arch = Architecture.Arch(sess, params, testingModel,
                              prepare_train_set=False)
-    arch.evaluate_dataset("test/LanideNN_testset", langs)
+    # not optimised at all
+    # arch.evaluate_dataset("test/LanideNN_testset", langs)
 
-
-
-
+    # The LanideNN can recognize every character, but this function only
+    # evaluates whole sentence
     arch.evaluate_string('Text reading assistance: 昨日すき焼きを食べました.', True, ['jpn','eng'])
     arch.evaluate_string('El chico no tiene en la cabeza nada más que el negocio. Der Junge hat ja nichts im Kopf als das Geschäft.', True, ['deu', 'spa'])
     arch.evaluate_string('La signora lesse il messaggio e volse a Daisy uno sguardo di intesa. The lady read the message and looked up at Daisy in a knowing way.', True, ['ita','eng'])

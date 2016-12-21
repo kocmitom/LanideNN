@@ -2,7 +2,8 @@
 
 LanideNN is language identification method based on Bidirectional Recurrent Neural Networks [1] and it performs well in monolingual and multilingual language identification tasks on six testsets. The method keeps its accuracy also for short documents and across domains, so it is ideal for the off-the-shelf use without preparation of training data.
 
-We have released the LanideNN code and models at https://github.com/tomkocmi/LanideNN
+We have also released the LanideNN dataset. More is at https://ufal.mff.cuni
+.cz/tom-kocmi/lanidenn
 
 
 # Installation
