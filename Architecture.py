@@ -148,8 +148,9 @@ class Arch(object):
                     # no language was outputted
                     bal.write(filename[1] + separator + unknown + "\n")
 
-    def evaluate_dataset(self, allowed_languages=None):
-        source = "test/LanideNN_testset"
+    def evaluate_dataset(self, source,
+                         allowed_languages=None):
+
         correct_all = 0
         total_all = 0
         with open(source, mode='r') as src:
@@ -191,8 +192,6 @@ class Arch(object):
         total = 0
         orig = ""
         classif = ""
-        last_class = -1
-        ##print(languages[0])
         while not datafile.is_finished():
             dev_batch_xs, _, lengths = datafile.get_batch()
             
@@ -200,7 +199,6 @@ class Arch(object):
                 outs = self.model.eval(self.sess, dev_batch_xs, lengths, langs_mask = langs_mask)
             else:
                 outs = self.model.eval(self.sess, dev_batch_xs, lengths)
-            ##outs = self.model.eval_probs(self.sess, dev_batch_xs, lengths)
             for j in range(len(outs[0])):
                 for i in range(len(outs)):
                     if languages is not None:
@@ -208,41 +206,23 @@ class Arch(object):
                         for a in range(len(langs_mask)):
                             if langs_mask[a]==1:
                                 new_out[a] = outs[i][j][a]
-                        maxsort = sorted(new_out, key=new_out.get) 
-                    else:
-                        maxsort = outs[i][j].argsort()
                     
                     maxim = outs[i][j]
-                    #maxim = maxsort[-1]
-                    #maxim2 = maxsort[-2]
-                    #maxim3 = maxsort[-3]
                     
                     if dev_batch_xs[i][j] == datafile.trg_vocab.PAD_ID:
                         break
                     guesses[maxim] += 1
-                    if print_per_character:
-                        sums = outs[i][j][maxim] + outs[i][j][maxim2]
-                        #print(datafile.get_source_name(dev_batch_xs[i][j]),datafile.get_target_name(maxim), outs[i][j][maxim]/sums, datafile.get_target_name(maxim2), outs[i][j][maxim2]/sums)
-                        print(outs[i][j][self.train_set.trg_vocab.get_id(languages[0])]/sums)
-                        if last_class != maxim:
-                            while len(orig) < len(classif):
-                                orig += " "
-                            while len(classif) < len(orig):
-                                classif += " "
-                            classif += str(datafile.get_target_name(maxim)) + " "
-                            last_class = maxim
-                        orig += str(datafile.get_source_name(dev_batch_xs[i][j]))
 
                     total += 1
         max = np.argmax(guesses)
-        #print(max)
         if print_per_character:
             print(orig)
             print(classif)
         accur = 0
         if total > 0:
             accur = float(guesses[max]) / float(total)
-        return [datafile.get_target_name(max), accur]
+            
+        print([datafile.get_target_name(max), accur])
 
     def training(self, eval=None):
         self.train_set.skip_n_lines(self.params.params["trained_lines"])

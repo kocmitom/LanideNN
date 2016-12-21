@@ -15,11 +15,10 @@ params = Parameters.Parameters("PARAMS")
 testingModel = False
 continueModel = False
 
-# WIKIMULTI
-#testingModel = "models/WikiMulti.model"
-# ALTW
-# testingModel = "models/ALTW.model"
 
+# UNCOMMENT MODEL - first must be downloaded from:
+#testingModel = "models/WikiMulti.model"
+# testingModel = "models/ALTW.model"
 testingModel = "models/LanideNN.model"
 
 
@@ -32,7 +31,7 @@ elif testingModel:
     logging.info("Loading model " + testingModel)
 else:
     params.add_integer("version", 3)  # version of a code
-    params.add_string("corpus_name", "data/small")  # Folder with data.
+    params.add_string("corpus_name", "small")  # Folder within data/.
     params.add_bool("unicode_normalization", True)  # normalize unicode
     params.add_integer("size", 500)  # Size of each model layer.
     params.add_integer("embedding_size", 200)  # Size of each model layer.
@@ -59,38 +58,27 @@ params.print()
 with tf.Session() as sess:
     start = time.time()  # for counting the time
 
+    # TRAINING
+    # arch = Architecture.Arch(sess, params, testingModel)
+    # arch.training()
+
+
+    # TESTING
+    langs = None
+    # langs = ['ces', 'eng', 'fra', 'deu', 'spa']
     arch = Architecture.Arch(sess, params, testingModel,
                              prepare_train_set=False)
-
-    #arch.training()
-
-
-    langs = None
-    # langs = ['afr', 'sqi', 'ara', 'hye', 'aze', 'eus', 'bel',
-    #                        'ben', 'bul', 'cat', 'hrv', 'ces', 'zho', 'dan',
-    #                        'nld', 'eng', 'est', 'fin', 'fra', 'glg', 'kat',
-    #                        'deu', 'ell', 'guj', 'hat', 'heb', 'hin', 'hun',
-    #                        'isl', 'ind', 'gle', 'ita', 'jav', 'jpn', 'kan',
-    #                        'kor', 'lav', 'lit', 'mkd', 'msa', 'mal', 'mlt',
-    #                        'mar', 'nep', 'nor', 'ori', 'fas', 'pol', 'por',
-    #                        'pan', 'ron', 'rus', 'srp', 'sin', 'slk', 'slv',
-    #                        'spa', 'swa', 'swe', 'tgl', 'tam', 'tel', 'tha',
-    #                        'tur', 'ukr', 'urd', 'vie', 'cym']
-
-    arch.evaluate_short_dataset(langs)
+    arch.evaluate_dataset("test/LanideNN_testset", langs)
 
 
-    #arch.evaluate_string('Ich sag Gute Nacht. And I say good night. Schon leuchtet ein Stern. Yes, I see the light.', True, ['deu', 'eng'])
-    #arch.evaluate_string('Text reading assistance: 昨日すき焼きを食べました.', True, ['jpn','eng'])
-    #arch.evaluate_string('The Quatrième Étage is a short story written by Jean Hougron', True, ['fra', 'eng'])
-    #arch.evaluate_string("Je n'ai pas dormi depuis trois jours. I haven’t slept for three days. Est-ce que vous en avez parlé à la police", True, ['fra','eng'])
-    #arch.evaluate_string('La signora lesse il messaggio e volse a Daisy uno sguardo di intesa. The lady read the message and looked up at Daisy in a knowing way.', True, ['ita','eng'])
-    #arch.evaluate_string('Nearby was a little note written in pencil. Vedle byla malá cedulka se vzkazem napsaným tužkou.', True, ['ces','eng'])
-    #arch.evaluate_string("At that time of night there were few people around. A cette heure de la nuit il n'y avait pas grand monde aux alentours.", True, ['fra','eng'])
-    #arch.evaluate_string("Cette église s'élevait sur une place étroite et sombre, près de la grille du Palais. Tämä kirkko oli ahtaalla ja pimeällä paikalla lähellä Oikeuspalatsin aitausta. The church stood in a narrow, gloomy square, not far from the gates of the Palais de Justice.", True, ['eng', 'fra', 'fin'])
-    #arch.evaluate_string('She was thirty years old and had been a detective for the past two years. Ей было тридцать лет, и последние два года она была сыщиком.', True,['rus','eng'])
-    #arch.evaluate_string('Eravamo tre contro uno, però; e la mozione fu approvata. Men omröstningen utföll tre mot en dock, sa förslaget bifölls.', True, ['ita','swe'])
-    #arch.evaluate_string('El chico no tiene en la cabeza nada más que el negocio. Der Junge hat ja nichts im Kopf als das Geschäft.', True, ['deu', 'spa'])
+
+
+    arch.evaluate_string('Text reading assistance: 昨日すき焼きを食べました.', True, ['jpn','eng'])
+    arch.evaluate_string('El chico no tiene en la cabeza nada más que el negocio. Der Junge hat ja nichts im Kopf als das Geschäft.', True, ['deu', 'spa'])
+    arch.evaluate_string('La signora lesse il messaggio e volse a Daisy uno sguardo di intesa. The lady read the message and looked up at Daisy in a knowing way.', True, ['ita','eng'])
+    arch.evaluate_string("At that time of night there were few people around. A cette heure de la nuit il n'y avait pas grand monde aux alentours.", True, ['fra','eng'])
+    arch.evaluate_string('Eravamo tre contro uno, però; e la mozione fu approvata. Men omröstningen utföll tre mot en dock, sa förslaget bifölls.', True, ['ita','swe'])
+    arch.evaluate_string('Ich sag Gute Nacht. And I say good night. Schon leuchtet ein Stern. Yes, I see the light.', True, ['deu', 'eng'])
 
 
     print("Script finished in " + str(int(time.time() - start)) + " s")
