@@ -20,7 +20,7 @@ class Arch(object):
         self.train_set = Data(self.params, "data/" + self.params.get(
             "corpus_name") + "/train", None, only_eval=False)
 
-        if self.prepare_train_set:
+        if prepare_train_set:
             self.train_set.prepare_data(self.params.get("min_count"))
 
         self.model = BiRNN_Embed.Model(sess, self.params, self.train_set.vocab_size())
