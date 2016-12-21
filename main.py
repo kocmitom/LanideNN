@@ -59,7 +59,8 @@ params.print()
 with tf.Session() as sess:
     start = time.time()  # for counting the time
 
-    arch = Architecture.Arch(sess, params, testingModel)
+    arch = Architecture.Arch(sess, params, testingModel,
+                             prepare_train_set=False)
 
     #arch.training()
 

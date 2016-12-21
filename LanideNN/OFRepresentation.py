@@ -9,7 +9,8 @@ import abc
 
 
 class Repre(object):
-    def __init__(self, original_filename, vocabulary_path, params=None, use_eol = False, text_to_eval = None):
+    def __init__(self, original_filename, vocabulary_path, params=None,
+                 use_eol = False, text_to_eval = None):
         self.prepared_data = False  # consider data not prepared
         self.original_filename = original_filename
         self.encoding = "utf-8"  # for baldwin dataset use

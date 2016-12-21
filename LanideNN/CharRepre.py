@@ -9,8 +9,11 @@ from LanideNN import OFRepresentation
 
 
 class Data(OFRepresentation.Repre):
-    def __init__(self, params, original_filename, vocabulary_path=None, only_eval=False, use_eol=False, text_to_eval = None):
-        OFRepresentation.Repre.__init__(self, original_filename, vocabulary_path, params, use_eol, text_to_eval)
+    def __init__(self, params, original_filename, vocabulary_path=None,
+                 only_eval=False, use_eol=False, text_to_eval = None):
+        OFRepresentation.Repre.__init__(self, original_filename,
+                                        vocabulary_path, params, use_eol,
+                                        text_to_eval)
 
         self.only_eval = only_eval  # if the file does not have targets
         if text_to_eval is not None:
