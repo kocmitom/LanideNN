@@ -32,7 +32,7 @@ elif testingModel:
     logging.info("Loading model " + testingModel)
 else:
     params.add_integer("version", 3)  # version of a code
-    params.add_string("corpus_name", "data")  # Folder with data.
+    params.add_string("corpus_name", "data/small")  # Folder with data.
     params.add_bool("unicode_normalization", True)  # normalize unicode
     params.add_integer("size", 500)  # Size of each model layer.
     params.add_integer("embedding_size", 200)  # Size of each model layer.
