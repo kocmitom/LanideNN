@@ -206,12 +206,12 @@ class Arch(object):
                     if dev_batch_xs[i][j] == datafile.trg_vocab.PAD_ID:
                         break
                     guesses[maxim] += 1
-
+                    if print_per_character:
+                        classif = datafile.get_target_name(outs[i][j], "orig")
+                        orig = datafile.get_source_name(dev_batch_xs[i][j])
+                        print(orig, classif)
                     total += 1
         max = np.argmax(guesses)
-        if print_per_character:
-            print(orig)
-            print(classif)
         accur = 0
         if total > 0:
             accur = float(guesses[max]) / float(total)
