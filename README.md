@@ -21,6 +21,10 @@ Simply edit main.py and run it. You can train your own models or load
 our pretrained models at
 http://ufallab.ms.mff.cuni.cz/~kocmanek/lanidenn_models.tar.gz
 
+Evaluated on following testset:
+https://1drv.ms/t/s!Aq0goPMF_Lnlg-Jf47U0VGYAJL46qA?e=feDcS7
+
+
 # Contact
 
 In case of any problems please feel free to send an email to
